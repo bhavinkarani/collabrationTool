@@ -75,9 +75,12 @@
     </style>
   </head>
   <body>
-
+<input type="text" id="name" value="">
+  <br>
+  <br><br>
+  <input type="button" id="getName" value="Submit">
 <div id="fixed">
-    <div class="fixedHeader">rupinder</div>
+    <div id="chatUser" class="fixedHeader"></div>
     <div class="fixedContent"></div>
     <div class="chatbox">
         <textarea class="userinput" style="height: 16px; ">Type here...</textarea>            
@@ -87,7 +90,7 @@
 <script type="text/javascript">
 $( document ).ready(function(){
   var socket = io();
-
+  
   var toggle = true;
   var user="rupinder";
   var searchBoxText= "Type here...";
@@ -97,7 +100,12 @@ $( document ).ready(function(){
   var Header = $(".fixedHeader"); // cache header div
   var Chatbox = $(".userinput"); // cache header div
   Parent.css('height', '30px');
-
+  $("#getName").click(function(){
+    localStorage.setItem("user",$("#name").val());
+    user = localStorage.getItem("user");
+    document.getElementById("chatUser").innerHTML =user;
+});
+  localStorage.setItem("lastname", "Smith");
   Header.click(function(){           
       toggle = (!toggle) ? true : false;
       if(toggle)
