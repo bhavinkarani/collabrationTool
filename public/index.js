@@ -50,7 +50,7 @@ $( document ).ready(function(){
           $('.fixedContent').append("<div class='userwrap'><span class='user'>"+user+"</span><span class='messages'>"+$(this).val()+"</span><div class='userwrap'></div>");
           event.preventDefault();
        
-          $(".fixedContent").scrollTop($(".fixedContent").height());
+          $(".fixedContent").scrollTop( $(".fixedContent").prop("scrollHeight") );
           $(this).val('');
       }
       
