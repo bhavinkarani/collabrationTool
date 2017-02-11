@@ -1,9 +1,12 @@
 $( document ).ready(function(){
 
-  $('#myModal').modal({
-    backdrop: 'static',
-    keyboard: false
-  });
+  if (localStorage.getItem("user") === null) {
+    $('#myModal').modal({
+      backdrop: 'static',
+      keyboard: false
+    });
+  } 
+ 
 
   var socket = io();
   var toggle = true;
