@@ -1,8 +1,8 @@
 $( document ).ready(function(){
   var socket = io();
-  
   var toggle = true;
-  var user="rupinder";
+  var user=localStorage.getItem("user");
+  $("#chatUser").text( user );
   var searchBoxText= "Type here...";
   var fixIntv;
   var fixedBoxsize = $('#fixed').outerHeight()+'px';
@@ -35,7 +35,7 @@ $( document ).ready(function(){
       $(this).val(($(this).val()=='')? searchBoxText : $(this).val());
   }).keyup(function(e){
       var code = (e.keyCode ? e.keyCode : e.which);       
-      if(code==13){
+      if(code==13 && $(this).val().trim().length>0){
           socket.emit("chat message from client", { user: user , msg : $(this).val() } );
 
           $('.fixedContent').append("<div class='userwrap'><span class='user'>"+user+"</span><span class='messages'>"+$(this).val()+"</span><div class='userwrap'></div>");
