@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Chat sample</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+
+    <style type="text/css">
+#fixed {
+    bottom: 0;
+    right: 2%;
+    margin-left: -200px;
+    overflow: hidden;
+    padding: 0 5px;
+    position: fixed;
+    width: 400px;
+    z-index: 1001;
+}
+
+.fixedHeader {
+    background: none repeat scroll 0 0 #6d84b4;
+    border: 1px solid #3d5a99;
+    border-bottom: none;
+    color: #fff;
+    height: 22px;
+    margin: 0 auto;
+    padding: 5px;
+    width: 390px;   
+    font-weight:700;
+    font-size:15px;
+}
+
+.fixedContent {
+    background: none repeat scroll 0 0 #ffffff;
+    border-left: 1px solid #b2b2b2;
+    border-right: 1px solid #b2b2b2;
+    margin: 0 auto;   
+    width: 400px;
+    height:300px;
+    overflow: auto;
+}
+
+.userinput{
+    width: 390px;
+    height:16px;
+    outline:none;
+    display:block;
+    resize:none;
+    padding:5px;    
+}
+
+.messages{
+    color: #333;
+    line-height: 1.28;
+    padding:5px;
+    margin-left:70px;
+    font-size: 14px;
+    display: block;
+}
+
+.userwrap{
+    position:relative;
+}
+
+.user{
+    padding: 5px ;
+    font-size:12px;
+    color:#888;
+    font-weight:700;
+    position:absolute;
+    left:0; top:0;
+}
+
+
+    </style>
+  </head>
+  <body>
+
+<div id="fixed">
+    <div class="fixedHeader">rupinder</div>
+    <div class="fixedContent"></div>
+    <div class="chatbox">
+        <textarea class="userinput" style="height: 16px; ">Type here...</textarea>            
+    </div>
+</div>
+
+<script type="text/javascript">
+$( document ).ready(function(){
+  var socket = io();
+
+  var toggle = true;
+  var user="rupinder";
+  var searchBoxText= "Type here...";
+  var fixIntv;
+  var fixedBoxsize = $('#fixed').outerHeight()+'px';
+  var Parent = $("#fixed"); // cache parent div
+  var Header = $(".fixedHeader"); // cache header div
+  var Chatbox = $(".userinput"); // cache header div
+  Parent.css('height', '30px');
+
+  Header.click(function(){           
+      toggle = (!toggle) ? true : false;
+      if(toggle)
+      {
+          Parent.animate({'height' : fixedBoxsize}, 300);                    
+      }
+      else
+      {
+          Parent.animate({'height' : '30px'}, 300); 
+      }
+      
+  });
+
+  Chatbox.focus(function(){
+      $(this).val(($(this).val()==searchBoxText)? '' : $(this).val());
+  }).blur(function(){
+      $(this).val(($(this).val()=='')? searchBoxText : $(this).val());
+  }).keyup(function(e){
+      var code = (e.keyCode ? e.keyCode : e.which);       
+      if(code==13){
+          socket.emit("chat message from client", { user: user , msg : $(this).val() } );
+
+          $('.fixedContent').append("<div class='userwrap'><span class='user'>"+user+"</span><span class='messages'>"+$(this).val()+"</span><div class='userwrap'></div>");
+          event.preventDefault();
+       
+          $(".fixedContent").scrollTop($(".fixedContent").height());
+          $(this).val('');
+      }
+      
+  });
+
+
+  socket.on("chat message from server",function(data){
+    $('.fixedContent').append("<div class='userwrap'><span class='user'>"+data["user"]+"</span><span class='messages'>"+data["msg"]+"</span></div>");
+  });
+
+}); // doc ready function end
+
+</script>
+  </body>
+</html>
