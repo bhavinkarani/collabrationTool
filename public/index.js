@@ -69,8 +69,10 @@ $( document ).ready(function(){
   ctx.lineWidth = 3;
   var canvasDataWidth=1;
   var canvasDataHeight=1;
+  var canvasIsLocked = false
 
   socket.on("canvas data from server-mousedown",function(data){
+    canvasIsLocked = true;
     imgd = ctx.createImageData(data["w"],data["h"]);
     imgd.data.set( data["imageDataBuffer"] );
     // ctx.putImageData( imgd ,data["x"],data["y"]);
@@ -79,7 +81,7 @@ $( document ).ready(function(){
     // ctx.lineTo(data["x"],data["y"]);
     // ctx.strokeStyle="red";
     // ctx.stroke();
-    console.log( imgd );
+    // console.log( imgd );
   });
 
 
@@ -91,7 +93,11 @@ $( document ).ready(function(){
     ctx.lineTo(data["x"],data["y"]);
     ctx.strokeStyle=data["color"];
     ctx.stroke();
-    console.log( imgd );
+    // console.log( imgd );
+  });
+
+  socket.on("canvas data from server-mouseup",function(data){
+    canvasIsLocked = false;
   });
 
   if(myCanvas){
@@ -99,25 +105,27 @@ $( document ).ready(function(){
                   var canvasX, canvasY;     
                   $(myCanvas)
                   .mousedown(function(e){
-                                  isDown = true;
-                                  ctx.beginPath();
-                                  canvasX = e.pageX - myCanvas.offsetLeft;
-                                  canvasY = e.pageY - myCanvas.offsetTop;
-                                  ctx.moveTo(canvasX, canvasY);
-
-                                  var imgd=ctx.getImageData(canvasX,canvasY,canvasDataWidth,canvasDataHeight);
-                                  // console.log( imgd )
-                                  socket.emit("canvas data from client-mousedown",{ 
-                                    imageDataBuffer:imgd.data.buffer,
-                                    x:canvasX,
-                                    y:canvasY,
-                                    w:canvasDataWidth,
-                                    h:canvasDataHeight,
-                                    color:curColor
-                                  });
+                      if( canvasIsLocked == false ){
+                                    isDown = true;
+                                    ctx.beginPath();
+                                    canvasX = e.pageX - myCanvas.offsetLeft;
+                                    canvasY = e.pageY - myCanvas.offsetTop;
+                                    ctx.moveTo(canvasX, canvasY);
+  
+                                    var imgd=ctx.getImageData(canvasX,canvasY,canvasDataWidth,canvasDataHeight);
+                                    // console.log( imgd )
+                                    socket.emit("canvas data from client-mousedown",{ 
+                                      imageDataBuffer:imgd.data.buffer,
+                                      x:canvasX,
+                                      y:canvasY,
+                                      w:canvasDataWidth,
+                                      h:canvasDataHeight,
+                                      color:curColor
+                                    });
+                      }
                   })
                   .mousemove(function(e){
-                                  if(isDown != false) {
+                                  if(isDown != false && canvasIsLocked==false ) {
                                           canvasX = e.pageX - myCanvas.offsetLeft;
                                           canvasY = e.pageY - myCanvas.offsetTop;
                                           ctx.lineTo(canvasX, canvasY);
@@ -137,9 +145,13 @@ $( document ).ready(function(){
                                   }
                   })
                   .mouseup(function(e){
-                                  isDown = false;
-                                  ctx.closePath();
-                                  console.log("mouse is up");
+                          if(canvasIsLocked==false){
+                                        isDown = false;
+                                        ctx.closePath();
+                                        // console.log("mouse is up");
+      
+                                        socket.emit("canvas data from client-mouseup",{});
+                          }
                   });
   }
    

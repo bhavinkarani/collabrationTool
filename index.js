@@ -38,8 +38,15 @@ io.on('connection', function(socket){
     socket.broadcast.emit("canvas data from server-mousemove",data);
   });
 
+  socket.on("canvas data from client-mouseup",function(data){
+    socket.broadcast.emit("canvas data from server-mouseup",{});
+  });
+
 });
 
 http.listen(3000, function(){
   console.log('listening on *:3000');
 });
+
+
+
