@@ -9,7 +9,7 @@ $( document ).ready(function(){
  
 
   var socket = io();
-  var toggle = true;
+  var toggle = false;
   var user=localStorage.getItem("user");
   $("#chatUser").text( user );
   var searchBoxText= "Type here...";
@@ -60,5 +60,45 @@ $( document ).ready(function(){
   socket.on("chat message from server",function(data){
     $('.fixedContent').append("<div class='userwrap'><span class='user'>"+data["user"]+"</span><span class='messages'>"+data["msg"]+"</span></div>");
   });
+
+
+
+  var myCanvas = document.getElementById("myCanvas");
+  var curColor = $('#selectColor option:selected').val();
+  if(myCanvas){
+                  var isDown      = false;
+                  var ctx = myCanvas.getContext("2d");
+                  var canvasX, canvasY;
+                  ctx.lineWidth = 3;
+                   
+                  $(myCanvas)
+                  .mousedown(function(e){
+                                  isDown = true;
+                                  ctx.beginPath();
+                                  canvasX = e.pageX - myCanvas.offsetLeft;
+                                  canvasY = e.pageY - myCanvas.offsetTop;
+                                  ctx.moveTo(canvasX, canvasY);
+                  })
+                  .mousemove(function(e){
+                                  if(isDown != false) {
+                                          canvasX = e.pageX - myCanvas.offsetLeft;
+                                          canvasY = e.pageY - myCanvas.offsetTop;
+                                          ctx.lineTo(canvasX, canvasY);
+                                          ctx.strokeStyle = curColor;
+                                          ctx.stroke();
+                                  }
+                  })
+                  .mouseup(function(e){
+                                  isDown = false;
+                                  ctx.closePath();
+                                  console.log("mouse is up");
+                  });
+  }
+   
+  $('#selectColor').change(function () {
+                  curColor = $('#selectColor option:selected').val();
+  });
+            
+
 
 }); // doc ready function end
