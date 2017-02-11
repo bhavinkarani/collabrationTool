@@ -30,6 +30,14 @@ io.on('connection', function(socket){
     socket.broadcast.emit( "chat message from server", data );
   });
 
+  socket.on("canvas data from client-mousedown",function(data){
+    socket.broadcast.emit("canvas data from server-mousedown",data);
+  });
+
+    socket.on("canvas data from client-mousemove",function(data){
+    socket.broadcast.emit("canvas data from server-mousemove",data);
+  });
+
 });
 
 http.listen(3000, function(){

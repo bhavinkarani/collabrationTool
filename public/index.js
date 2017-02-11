@@ -65,12 +65,38 @@ $( document ).ready(function(){
 
   var myCanvas = document.getElementById("myCanvas");
   var curColor = $('#selectColor option:selected').val();
+  var ctx = myCanvas.getContext("2d");
+  ctx.lineWidth = 3;
+  var canvasDataWidth=1;
+  var canvasDataHeight=1;
+
+  socket.on("canvas data from server-mousedown",function(data){
+    imgd = ctx.createImageData(data["w"],data["h"]);
+    imgd.data.set( data["imageDataBuffer"] );
+    // ctx.putImageData( imgd ,data["x"],data["y"]);
+    ctx.beginPath();
+    ctx.moveTo(data["x"],data["y"]);
+    // ctx.lineTo(data["x"],data["y"]);
+    // ctx.strokeStyle="red";
+    // ctx.stroke();
+    console.log( imgd );
+  });
+
+
+  socket.on("canvas data from server-mousemove",function(data){
+    imgd = ctx.createImageData(data["w"],data["h"]);
+    imgd.data.set( data["imageDataBuffer"] );
+    // ctx.putImageData( imgd ,data["x"],data["y"]);
+    // ctx.moveTo(data["x"],data["y"]);
+    ctx.lineTo(data["x"],data["y"]);
+    ctx.strokeStyle=data["color"];
+    ctx.stroke();
+    console.log( imgd );
+  });
+
   if(myCanvas){
-                  var isDown      = false;
-                  var ctx = myCanvas.getContext("2d");
-                  var canvasX, canvasY;
-                  ctx.lineWidth = 3;
-                   
+                  var isDown = false;
+                  var canvasX, canvasY;     
                   $(myCanvas)
                   .mousedown(function(e){
                                   isDown = true;
@@ -78,6 +104,17 @@ $( document ).ready(function(){
                                   canvasX = e.pageX - myCanvas.offsetLeft;
                                   canvasY = e.pageY - myCanvas.offsetTop;
                                   ctx.moveTo(canvasX, canvasY);
+
+                                  var imgd=ctx.getImageData(canvasX,canvasY,canvasDataWidth,canvasDataHeight);
+                                  // console.log( imgd )
+                                  socket.emit("canvas data from client-mousedown",{ 
+                                    imageDataBuffer:imgd.data.buffer,
+                                    x:canvasX,
+                                    y:canvasY,
+                                    w:canvasDataWidth,
+                                    h:canvasDataHeight,
+                                    color:curColor
+                                  });
                   })
                   .mousemove(function(e){
                                   if(isDown != false) {
@@ -86,6 +123,17 @@ $( document ).ready(function(){
                                           ctx.lineTo(canvasX, canvasY);
                                           ctx.strokeStyle = curColor;
                                           ctx.stroke();
+
+                                          var imgd=ctx.getImageData(canvasX,canvasY,canvasDataWidth,canvasDataHeight);
+                                          // console.log( imgd )
+                                          socket.emit("canvas data from client-mousemove",{ 
+                                            imageDataBuffer:imgd.data.buffer,
+                                            x:canvasX,
+                                            y:canvasY,
+                                            w:canvasDataWidth,
+                                            h:canvasDataHeight,
+                                            color:curColor
+                                          });
                                   }
                   })
                   .mouseup(function(e){
