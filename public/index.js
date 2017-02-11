@@ -1,4 +1,10 @@
 $( document ).ready(function(){
+
+  $('#myModal').modal({
+    backdrop: 'static',
+    keyboard: false
+  });
+
   var socket = io();
   var toggle = true;
   var user=localStorage.getItem("user");
