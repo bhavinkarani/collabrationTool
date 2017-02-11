@@ -1,12 +1,16 @@
+var express=require('express')
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var path = require('path');
 var chatHistory =[];
 var chunk =5;
+
 app.get('/', function(req, res){
   res.sendFile( path.join(__dirname,'/public','/index.html') );
 });
+
+app.use( express.static('public') );
 
 io.on('connection', function(socket){
   console.log('a user connected');
