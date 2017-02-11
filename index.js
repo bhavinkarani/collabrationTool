@@ -15,7 +15,7 @@ app.use( express.static('public') );
 io.on('connection', function(socket){
   console.log('a user connected');
   if(chatHistory.length > chunk){
-  	var slicedArray = fruits.slice(chatHistory.length-chunk, chatHistory.length);
+  	var slicedArray = chatHistory.slice(chatHistory.length-chunk, chatHistory.length);
   	for(var i=0;i<slicedArray.length;i++){
   		socket.emit( "chat message from server", slicedArray[i] );
   	}
